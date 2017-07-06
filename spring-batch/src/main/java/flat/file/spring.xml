@@ -1,0 +1,44 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<context:component-scan base-package="flat.file"/>
+	
+	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names" value="firstname,lastname,birth" />
+						<property name="delimiter" value=";" />
+						
+					</bean>
+				</property>
+				<property name="fieldSetMapper" ref="contactFieldSetMapper" />
+			</bean>
+		</property>
+		<property name="resource" value="classpath:flat/file/contact.csv" />
+	</bean>
+
+    <!-- stored job-meta in memory -->
+    <bean id="jobRepository"
+	class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+	<property name="transactionManager" ref="transactionManager" />
+    </bean>
+
+    <bean id="transactionManager"
+	class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+
+    <bean id="jobLauncher"
+	class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+	<property name="jobRepository" ref="jobRepository" />
+    </bean>
+    
+    
+
+</beans>
